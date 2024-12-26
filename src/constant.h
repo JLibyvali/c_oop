@@ -14,4 +14,6 @@ typedef struct
     struct Base;
 } Derived;
 
+#define C_OOP_INIT(_type)
+
 #endif

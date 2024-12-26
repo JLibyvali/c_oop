@@ -107,14 +107,14 @@ typedef enum
         }                                                        \
     }                                                            \
     while (0)
-#define Checkerr(action, rtval, msg, ...) \
-    do                                    \
-    {                                     \
-        if ((action) == rtval)            \
-        {                                 \
-            Error(msg, ##__VA_ARGS__);    \
-        }                                 \
-    }                                     \
+#define Checkerr(action, resval, msg, ...) \
+    do                                     \
+    {                                      \
+        if ((action) == resval)            \
+        {                                  \
+            Error(msg, ##__VA_ARGS__);     \
+        }                                  \
+    }                                      \
     while (0)
 
 #endif
