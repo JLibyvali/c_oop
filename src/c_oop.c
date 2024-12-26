@@ -1,15 +1,8 @@
+#include "c_oop.h"
+
 #include "debug.h"
 
-#include <assert.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-#define GEN_LOGFILE 1
-
-int main()
+typedef struct
 {
-    printf("Hello\n");
-    Error("Message From Error");
-
-    return 0;
-}
+    void *m_data;
+} private;

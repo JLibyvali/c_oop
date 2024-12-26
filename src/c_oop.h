@@ -1,9 +1,17 @@
-#ifndef C_OOP_DEBUG__H
-#define C_OOP_DEBUG__H
+#ifndef C_OOP__H
+#define C_OOP__H
 
-typedef struct {
-  int (*m_derived)(void *_param);
-  void *m_private;
-} Base;
+
+#define new(_val, ...) \
+    do                 \
+    {                  \
+    }                  \
+    while (0)
+
+#define delete(_type_ptr, ...) \
+    do                         \
+    {                          \
+    }                          \
+    while (0)
 
 #endif

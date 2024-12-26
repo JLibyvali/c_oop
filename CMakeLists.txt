@@ -1,9 +1,17 @@
-cmake_minimum_required ( VERSION 3.20 )
+cmake_minimum_required ( VERSION 3.21 )
 project ( c_oop )
 enable_language ( C )
 
+add_compile_definitions ( GEN_LOGFILE=1 )
+
+# ##############################################################################
+# Custom Include
+# ##############################################################################
 include ( cmake/api.cmake )
-include_directories ( ./include )
+add_library ( oop_include OBJECT ./include/debug.c )
+target_include_directories ( oop_include BEFORE PUBLIC ./include )
+link_libraries ( oop_include )
+
 set ( CMAKE_C_STANDARD 11 )
 set ( CMAKE_C_STANDARD_REQUIRED ON )
 set ( CMAKE_C_EXTENSIONS OFF )
@@ -19,4 +27,21 @@ set ( CMAKE_C_FLAGS_DEBUG "-g3 -ggdb3 -O0 -Wall" )
 # ##############################################################################
 set ( CMAKE_C_FLAGS_RELEASE "-O2 -Wall" )
 
-add_executable ( test src/c_oop.c include/debug.c)
+# ##############################################################################
+# Export C_OOP library
+# ##############################################################################
+set ( srcs
+    ./src/c_oop.c
+    ./src/hashtable.c
+)
+add_library ( c_oop STATIC )
+target_sources ( c_oop PRIVATE ${srcs} )
+target_include_directories ( c_oop PUBLIC
+    ./src
+    ./src/reflection )
+
+# ##############################################################################
+# Test Target
+# ##############################################################################
+add_executable ( test ./test/user.c )
+target_link_libraries ( test PRIVATE c_oop )

@@ -7,7 +7,7 @@ endmacro ()
 # Usage: more_debug_info(target_name)
 function ( more_debug_info _target_name )
     if ( NOT TARGET ${_target_name} )
-        message ( FATAL_ERROR "@@@@@@@@@@ ${_target_name} Wrong @@@@@@@@@" )
+        message ( FATAL_ERROR "@@@@@@@@@@ ${_target_name}  IS Not A Target @@@@@@@@@" )
     endif ()
 
     set ( debug_ARCHIVES ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${_target_name}.dir )
@@ -21,12 +21,16 @@ function ( more_debug_info _target_name )
     )
 
     # Generate disassembler files
-    add_custom_command (
-        TARGET ${_target_name} POST_BUILD
-        COMMAND ${CMAKE_OBJDUMP} -S --source-comment="[@@@SOURCES@@@]" ${CMAKE_CURRENT_BINARY_DIR}/${_target_name} > ${debug_ARCHIVES}/${_target_name}.disasm
-        COMMENT "@@@@@@@@@ Generating Disassembler Information @@@@@@@@@@"
-        VERBATIM
-    )
+    get_target_property ( type ${_target_name} TYPE )
+
+    if ( type STREQUAL "EXECUTABLE" )
+        add_custom_command (
+            TARGET ${_target_name} POST_BUILD
+            COMMAND ${CMAKE_OBJDUMP} -S --source-comment="[@@@SOURCES@@@]" ${CMAKE_CURRENT_BINARY_DIR}/${_target_name} > ${debug_ARCHIVES}/${_target_name}.disasm
+            COMMENT "@@@@@@@@@ Generating Disassembler Information @@@@@@@@@@"
+            VERBATIM
+        )
+    endif ()
 endfunction ( more_debug_info _target_name )
 
 # Get current project generated all executable files
