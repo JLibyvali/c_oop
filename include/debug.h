@@ -48,7 +48,7 @@ typedef enum
  * then choose second arg as return value.
  *
  */
-#define __MACRO_STR(item)                     #item
+#define __MACRO_STR(item)                     "" #item
 #define __PLACE_HOLDER_1                      0,
 #define __TAKE_SECOND_ARG(_ignored, arg, ...) arg
 
@@ -58,7 +58,7 @@ typedef enum
 // it ONLY works inside a function, since it calls `strcmp()`
 // macros defined to themselves (#define A A) will get wrong results
 // ""#macro expand macro name as a string, whereas __MACRO_STR(macro) expand the macro first
-#define isdef(macro)                          (strcmp("" #macro, ""__MACRO_STR(macro)) != 0)
+#define isdef(macro)                          (strcmp("" #macro, __MACRO_STR(macro)) != 0)
 
 #define Error(format, ...)                           \
     do                                               \

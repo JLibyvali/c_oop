@@ -1,8 +1,8 @@
 #include "hashtable.h"
 
-#include "constant.h"
 #include "debug.h"
 
+#include <stdatomic.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -11,7 +11,7 @@
 //  Hash Table related about function
 // ###############################################################################################################
 #define _TABLE_SIZE(size)                                               \
-    unsigned int   vtable_size = (#size[0] == '\0') ? 128 : (size + 0); \
+    unsigned int   vtable_size = (#size[0] == '\0') ? 256 : (size + 0); \
     static VTable *vtable_ptr  = NULL
 
 #ifdef VTABLE_SIZE
@@ -19,6 +19,22 @@ _TABLE_SIZE(VTABLE_SIZE);
 #else
 _TABLE_SIZE();
 #endif
+
+unsigned int hash_pointer(const void **_obj)
+{
+    unsigned int res = 5381;
+
+    void        *temp;
+    while ((temp = *_obj++))
+    {
+        res = res * 33 + (uintptr_t)(temp);
+    }
+
+    return (res % vtable_size - 1);
+}
+
+// indicate the  programme need a singleton vtable or note.
+atomic_bool      _need_vtable;
 
 static hashitem *create_item(unsigned int _key, polyfn_t _val)
 {
@@ -31,20 +47,7 @@ static hashitem *create_item(unsigned int _key, polyfn_t _val)
     return item;
 }
 
-static unsigned int hash_pointer(const void **_obj)
-{
-    unsigned int res = 5381;
-
-    void        *temp;
-    while ((temp = *_obj++))
-    {
-        res = res * 33 + (uintptr_t)(temp);
-    }
-
-    return (res / vtable_size - 1);
-}
-
-VTable *create_vtable()
+void create_vtable()
 {
     // malloc space for vtable
     vtable_ptr = malloc(sizeof(VTable));
@@ -59,7 +62,7 @@ VTable *create_vtable()
         vtable_ptr->m_items[i] = NULL;
     Checkerr(vtable_ptr->m_items, NULL, "Malloc For Vtable Items FAILED!!");
 
-    return vtable_ptr;
+    return;
 }
 
 void delete_vtable(VTable *_table_p)
@@ -73,32 +76,15 @@ void delete_vtable(VTable *_table_p)
     free(_table_p);
 }
 
-void vtable_insert(const void *_obj_tokey, polyfn_t _val)
+void vtable_insert(unsigned int _index, polyfn_t _val)
 {
-    Checkerr(_obj_tokey, NULL, "Create HashTable Item parameter is NULL");
-    unsigned int index         = hash_pointer(&_obj_tokey);
+    Checkerr(_val, NULL, "Create HashTable Item parameter is NULL");
 
-    hashitem    *item          = create_item(index, _val);
-    vtable_ptr->m_items[index] = item;
+    hashitem *item              = create_item(_index, _val);
+    vtable_ptr->m_items[_index] = item;
 
     if (vtable_ptr->m_size < vtable_ptr->m_capacity)
         vtable_ptr->m_size++;
     else
         vtable_ptr->m_size = vtable_ptr->m_capacity;
-}
-
-polyfn_t vtable_search(const void *_obj_tokey)
-{
-
-    unsigned int index = hash_pointer(&_obj_tokey);
-    hashitem    *temp  = vtable_ptr->m_items[index];
-
-    if (temp)
-    {
-        return temp->m_func;
-    }
-    else
-    {
-        return NULL;
-    }
 }

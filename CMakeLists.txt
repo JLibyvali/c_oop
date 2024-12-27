@@ -20,7 +20,7 @@ set ( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 # ##############################################################################
 # Debug Mode
 # ##############################################################################
-set ( CMAKE_C_FLAGS_DEBUG "-g3 -ggdb3 -O0 -Wall" )
+set ( CMAKE_C_FLAGS_DEBUG "-g3 -ggdb3 -O0 -Wall -Wno-incompatible-pointer-types" )
 
 # ##############################################################################
 # Release Mode
@@ -43,5 +43,5 @@ target_include_directories ( c_oop PUBLIC
 # ##############################################################################
 # Test Target
 # ##############################################################################
-add_executable ( test ./test/user.c )
-target_link_libraries ( test PRIVATE c_oop )
+add_executable ( test_poly ./test/test_poly.c )
+target_link_libraries ( test_poly PRIVATE c_oop )
