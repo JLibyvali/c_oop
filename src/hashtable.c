@@ -10,17 +10,19 @@
 // ################################################################################################################
 //  Hash Table related about function
 // ###############################################################################################################
-#define _TABLE_SIZE(size)                                               \
-    unsigned int   vtable_size = (#size[0] == '\0') ? 256 : (size + 0); \
-    static VTable *vtable_ptr  = NULL
+#define _TABLE_SIZE(size)                                                      \
+    unsigned int   vtable_size        = (#size[0] == '\0') ? 256 : (size + 0); \
+    VTable *vtable_array[size] = {};
 
 #ifdef VTABLE_SIZE
 _TABLE_SIZE(VTABLE_SIZE);
 #else
 _TABLE_SIZE();
 #endif
+// Indicate the nums of created vtable
+atomic_uint   _vtable_index;
 
-unsigned int hash_pointer(const void **_obj)
+ unsigned int hash_pointer(void  **_obj)
 {
     unsigned int res = 5381;
 
@@ -33,9 +35,6 @@ unsigned int hash_pointer(const void **_obj)
     return (res % vtable_size - 1);
 }
 
-// indicate the  programme need a singleton vtable or note.
-atomic_bool      _need_vtable;
-
 static hashitem *create_item(unsigned int _key, polyfn_t _val)
 {
     hashitem *item = malloc(sizeof(hashitem));
@@ -47,26 +46,27 @@ static hashitem *create_item(unsigned int _key, polyfn_t _val)
     return item;
 }
 
-void create_vtable()
+VTable *create_vtable()
 {
     // malloc space for vtable
-    vtable_ptr = malloc(sizeof(VTable));
-    Checkerr(vtable_ptr, NULL, "Malloc VTable FAILED!!");
+    VTable *table = malloc(sizeof(VTable));
+    Checkerr(table, NULL, "Malloc VTable FAILED!!");
 
-    vtable_ptr->m_capacity = vtable_size;
-    vtable_ptr->m_size     = 0;
-    vtable_ptr->m_items    = malloc(vtable_size * sizeof(hashitem *));
+    table->m_capacity = vtable_size;
+    table->m_size     = 0;
+    table->m_items    = malloc(vtable_size * sizeof(hashitem *));
+    Checkerr(table->m_items, NULL, "Malloc For Vtable Items FAILED!!");
 
     // init hashtable item start value
-    for (int i = 0; i < vtable_ptr->m_capacity; i++)
-        vtable_ptr->m_items[i] = NULL;
-    Checkerr(vtable_ptr->m_items, NULL, "Malloc For Vtable Items FAILED!!");
+    for (int i = 0; i < table->m_capacity; i++)
+        table->m_items[i] = NULL;
 
-    return;
+    return table;
 }
 
-void delete_vtable(VTable *_table_p)
+void delete_vtable(unsigned int _table_idx )
 {
+    VTable * _table_p = vtable_array[_table_idx];
     Checkerr(_table_p, NULL, "Delete vtable parameter is NULL");
 
     for (int i = 0; i < _table_p->m_capacity; i++)
@@ -76,15 +76,28 @@ void delete_vtable(VTable *_table_p)
     free(_table_p);
 }
 
-void vtable_insert(unsigned int _index, polyfn_t _val)
+void vtable_insert(unsigned int _table_idx, unsigned int _index, polyfn_t _val)
 {
-    Checkerr(_val, NULL, "Create HashTable Item parameter is NULL");
+    Checkerr(_val, NULL, "Input `polyfn_t _val` parameter is NULL");
 
-    hashitem *item              = create_item(_index, _val);
-    vtable_ptr->m_items[_index] = item;
+    VTable *_table = vtable_array[_table_idx];
+    hashitem *item          = create_item(_index, _val);
+    _table->m_items[_index] = item;
 
-    if (vtable_ptr->m_size < vtable_ptr->m_capacity)
-        vtable_ptr->m_size++;
+    if (_table->m_size < _table->m_capacity)
+        _table->m_size++;
     else
-        vtable_ptr->m_size = vtable_ptr->m_capacity;
+        _table->m_size = _table->m_capacity;
 }
+
+polyfn_t __vtable_search(unsigned int _table_idx, unsigned int _key)
+ {
+     VTable *table = vtable_array[_table_idx];
+     hashitem *item  = table->m_items[_key];
+
+     if(item == NULL)
+            return  NULL;
+     else
+            return item->m_func;
+
+ }

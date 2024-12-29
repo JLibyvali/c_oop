@@ -18,14 +18,16 @@
         _datamember;                                                                 \
         _classmethod;                                                                \
         void *m_private;                                                             \
-        POLYFN(struct _typename, __VA_ARGS__)                                        \
+        POLYMETHOD_DECLARE(struct _typename, __VA_ARGS__)                            \
     } _typename;                                                                     \
+    /* Declare a function type validator */                                          \
+    void                     _typename##_typecheck(_typename _obj) {}                \
     static inline _typename *new_##_typename()                                       \
     {                                                                                \
         _typename *obj = (_typename *)malloc(sizeof(_typename));                     \
         Checkerr(obj, NULL, "Malloc of type: "__MACRO_STR(_typename) "FAILED!!");    \
         /* Check If class has virtual function to generate a vtable or not*/         \
-        __NEED_VTABLE(obj, __VA_ARGS__);                                  \
+        __NEED_VTABLE(obj, __VA_ARGS__);                                             \
         memset(obj, 0, sizeof(_typename));                                           \
         return obj;                                                                  \
     }                                                                                \
@@ -33,7 +35,8 @@
     {                                                                                \
         Checkerr(obj, NULL, __MACRO_STR(delete_##_typename) " parameter is NULL!!"); \
         free(obj);                                                                   \
-    }
+    }                                                                                \
+    POLYFUNCTION_DECLARE(_typename, __VA_ARGS__)
 
 #define new(_class, ...)                           \
     ({                                             \

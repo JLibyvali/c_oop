@@ -4,8 +4,8 @@
 #include <stddef.h>
 #include <stdio.h>
 
-Class(Text, MEMBER(int m_length; char *m_text;), METHOD(void (*get_length)(void)), print, change)
-Class(Tree, MEMBER(double m_circle), )
+Class(Text, MEMBER(int m_length; char *m_text;), METHOD(void (*get_length)(void)), print);
+Class(Tree, MEMBER(double m_circle), ,change);
 
 int song_print(Text *_in)
 {
@@ -23,15 +23,15 @@ int html_print(Text *_in)
     return 0;
 }
 
-typedef struct test
+typedef struct
 {
     int m_id;
-} test;
+} Test;
 
 int main()
 {
-
-    test  t;
+    // test type
+    Test test;
 
     // vtable test
     Text *song = new (Text, 33, "This is a simple love song, not that conflict song kind.", NULL, NULL, song_print);
@@ -41,9 +41,9 @@ int main()
         NULL, html_print
     );
 
-    song->print(song);
-    html->print(html);
+    print(song);
+    print(html);
 
-    delete (song, html);
+    delete (song,html);
     return 0;
 }

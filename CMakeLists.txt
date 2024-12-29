@@ -20,7 +20,8 @@ set ( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 # ##############################################################################
 # Debug Mode
 # ##############################################################################
-set ( CMAKE_C_FLAGS_DEBUG "-g3 -ggdb3 -O0 -Wall -Wno-incompatible-pointer-types" )
+# You can add the `-Wno-incompatible-pointer-types` flag
+set ( CMAKE_C_FLAGS_DEBUG "-g3 -ggdb3 -O0 -Wall" )
 
 # ##############################################################################
 # Release Mode

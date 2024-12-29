@@ -1,5 +1,5 @@
-#ifndef C_OOP_CONSTANT__H
-#define C_OOP_CONSTANT__H
+#ifndef C_OOP_MACRO__H
+#define C_OOP_MACRO__H
 #include <stddef.h>
 
 // ########################################################################
@@ -8,30 +8,32 @@
 
 typedef int (*polyfn_t)(void *);
 
-// Help for generate declaration of  virtual function.
-#define __POLYFN_DECL(typename, name) int (*name)(typename * _in);
-#define __POLYFN_RECURSIVE(typename, name, ...) \
-    __POLYFN_DECL(typename, name)               \
-    __VA_OPT__(__POLYFN_NEXT(typename, __VA_ARGS__))
+// Help for generate Declaration of virtual method
+#define __POLYMETHOD_DECL(typename, name) int (*name)(typename * _objptr);
+#define __POLYMETHOD_RECURSIVE(typename, name, ...) \
+    __POLYMETHOD_DECL(typename, name)               \
+    __VA_OPT__(__POLYMETHOD_NEXT(typename, __VA_ARGS__))
 
-#define __POLYFN_NEXT(typename, name, ...) \
-    __POLYFN_DECL(typename, name)          \
-    __VA_OPT__(__POLYFN_RECURSIVE(typename, __VA_ARGS__))
+#define __POLYMETHOD_NEXT(typename, name, ...) \
+    __POLYMETHOD_DECL(typename, name)          \
+    __VA_OPT__(__POLYMETHOD_RECURSIVE(typename, __VA_ARGS__))
 
-#define POLYFN(typename, ...)        __VA_OPT__(__POLYFN_RECURSIVE(typename, __VA_ARGS__))
+#define POLYMETHOD_DECLARE(typename, ...) __VA_OPT__(__POLYMETHOD_RECURSIVE(typename, __VA_ARGS__))
 
 // Help for invoke vtable_insert()
-#define __CALL_toparam(text1, text2) (#text1 "->" #text2)
-#define __CALL_vtable_insert(_objptr, name) \
-    vtable_insert(hash_pointer((void **)__CALL_toparam(_obj, name)), __CALL_toparam(_objptr, name));
+// #define __CALL_toparam(_objptr, _method)        (_objptr##->##_method)
 
-#define __POLYFNNAME_NEXT(_objptr, name, ...) \
-    __CALL_vtable_insert(_objptr, #name) __VA_OPT__(__POLYFNNAME_RECURSIVE(_objptr, __VA_ARGS__))
+#define __CALL_vtable_insert(_tableidx, _objptr, name)         \
+    unsigned int _key = hash_pointer((void **)&_objptr->name); \
+    vtable_insert(_tableidx, _key, (polyfn_t)(_objptr->name));
 
-#define __POLYFNNAME_RECURSIVE(_objptr, name, ...) \
-    __CALL_vtable_insert(_objptr, #name) __VA_OPT__(__POLYFNNAME_NEXT(_objptr, __VA_ARGS__))
+#define __GETNAME_NEXT(_tableidx, _objptr, name, ...) \
+    __CALL_vtable_insert(_tableidx, _objptr, name) __VA_OPT__(__GETNAME_RECURSIVE(_tableidx, _objptr, __VA_ARGS__))
 
-#define CALL_vtable_insert(_objptr, ...) __POLYFNNAME_RECURSIVE(_objptr, __VA_ARGS__)
+#define __GETNAME_RECURSIVE(_tableidx, _objptr, name, ...) \
+    __CALL_vtable_insert(_tableidx, _objptr, name) __VA_OPT__(__GETNAME_NEXT(_tableidx, _objptr, __VA_ARGS__))
+
+#define CALL_vtable_insert(_taleidx, _objptr, ...) __GETNAME_RECURSIVE(_taleidx, _objptr, __VA_ARGS__)
 
 // Help for free(...)
 #define __Free_list(...)                                       \
