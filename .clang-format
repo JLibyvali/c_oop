@@ -10,28 +10,28 @@ AlignConsecutiveAssignments:
   AcrossEmptyLines: true
   AcrossComments:  true
   AlignCompound:   true
-#  AlignFunctionPointers: false
+  AlignFunctionPointers: false
   PadOperators:    true
 AlignConsecutiveBitFields:
   Enabled:         false
   AcrossEmptyLines: false
   AcrossComments:  false
   AlignCompound:   false
-#  AlignFunctionPointers: false
+  AlignFunctionPointers: false
   PadOperators:    false
 AlignConsecutiveDeclarations:
   Enabled:         true
   AcrossEmptyLines: true
   AcrossComments:  true
   AlignCompound:   true
-#  AlignFunctionPointers: false
+  AlignFunctionPointers: false
   PadOperators:    true
 AlignConsecutiveMacros:
   Enabled:         true
   AcrossEmptyLines: true
   AcrossComments:  true
   AlignCompound:   true
-#  AlignFunctionPointers: false
+  AlignFunctionPointers: false
   PadOperators:    true
 AlignConsecutiveShortCaseStatements:
   Enabled:         true
@@ -83,7 +83,7 @@ BraceWrapping:
   SplitEmptyRecord: false
   SplitEmptyNamespace: false
 BreakAdjacentStringLiterals: true
-#BreakAfterAttributes: Leave
+BreakAfterAttributes: Leave
 BreakAfterJavaFieldAnnotations: false
 BreakArrays:     true #This is currently only for formatting JSON.
 BreakBeforeBinaryOperators: None
@@ -208,7 +208,7 @@ SpaceBeforeParensOptions:
   AfterFunctionDeclarationName: false
   AfterIfMacros:   true
   AfterOverloadedOperator: false
-#  AfterPlacementOperator: true
+  AfterPlacementOperator: true
   AfterRequiresInClause: false
   AfterRequiresInExpression: false
   BeforeNonEmptyParentheses: false

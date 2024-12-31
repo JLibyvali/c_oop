@@ -5,9 +5,9 @@
 #include <stdio.h>
 
 Class(Text, MEMBER(int m_length; char *m_text;), METHOD(void (*get_length)(void)), print);
-Class(Tree, MEMBER(double m_circle), ,change);
+Class(Tree, MEMBER(double m_circle), , change);
 
-int song_print(Text *_in)
+int song_print(Text *_in, void *param)
 {
     printf(LOG_FMT("&&&&&&&&&&&&&&&&&&&& SONG: Test ###############\n", LOG_PURPLE));
     printf("%s\n", _in->m_text);
@@ -15,13 +15,15 @@ int song_print(Text *_in)
     return 0;
 };
 
-int html_print(Text *_in)
+int html_print(Text *_in, void *param)
 {
     printf(LOG_FMT("-------- WebPage Test ------- \n", LOG_YELLOW));
     printf("%s\n", _in->m_text);
     printf("-------------------------");
     return 0;
 }
+
+int a_change(Tree *_in, void *param) { return 0; }
 
 typedef struct
 {
@@ -31,7 +33,7 @@ typedef struct
 int main()
 {
     // test type
-    Test test;
+    Test  test;
 
     // vtable test
     Text *song = new (Text, 33, "This is a simple love song, not that conflict song kind.", NULL, NULL, song_print);
@@ -41,9 +43,11 @@ int main()
         NULL, html_print
     );
 
-    print(song);
-    print(html);
+    Tree *a = new (Tree, 33.1313,NULL , a_change);
 
-    delete (song,html);
+    print(song, NULL);
+    print(html, NULL);
+
+    delete (song, html);
     return 0;
 }

@@ -7,30 +7,31 @@
 #include <stdlib.h>
 #include <string.h>
 
-// ################################################################################################################
-//  Hash Table related about function
-// ###############################################################################################################
-#define _TABLE_SIZE(size)                                                      \
-    unsigned int   vtable_size        = (#size[0] == '\0') ? 256 : (size + 0); \
-    VTable *vtable_array[size] = {};
+#define _TABLE_SIZE(size)                                                    \
+    unsigned int vtable_size        = (#size[0] == '\0') ? 256 : (size + 0); \
+    VTable      *vtable_array[size] = {};
 
+/**
+ * @brief  Define that how many virtual functions, default can definition 256 virtual functons.
+ */
 #ifdef VTABLE_SIZE
 _TABLE_SIZE(VTABLE_SIZE);
 #else
 _TABLE_SIZE();
 #endif
 // Indicate the nums of created vtable
-atomic_uint   _vtable_index;
+atomic_uint  _vtable_index;
 
- unsigned int hash_pointer(void  **_obj)
+// ################################################################################################################
+//  Function definition.
+// ###############################################################################################################
+
+unsigned int hash_pointer(void **_obj)  // From Glib char* hash function.
 {
     unsigned int res = 5381;
-
     void        *temp;
     while ((temp = *_obj++))
-    {
         res = res * 33 + (uintptr_t)(temp);
-    }
 
     return (res % vtable_size - 1);
 }
@@ -64,9 +65,9 @@ VTable *create_vtable()
     return table;
 }
 
-void delete_vtable(unsigned int _table_idx )
+void delete_vtable(unsigned int _table_idx)
 {
-    VTable * _table_p = vtable_array[_table_idx];
+    VTable *_table_p = vtable_array[_table_idx];
     Checkerr(_table_p, NULL, "Delete vtable parameter is NULL");
 
     for (int i = 0; i < _table_p->m_capacity; i++)
@@ -80,7 +81,7 @@ void vtable_insert(unsigned int _table_idx, unsigned int _index, polyfn_t _val)
 {
     Checkerr(_val, NULL, "Input `polyfn_t _val` parameter is NULL");
 
-    VTable *_table = vtable_array[_table_idx];
+    VTable   *_table        = vtable_array[_table_idx];
     hashitem *item          = create_item(_index, _val);
     _table->m_items[_index] = item;
 
@@ -88,16 +89,17 @@ void vtable_insert(unsigned int _table_idx, unsigned int _index, polyfn_t _val)
         _table->m_size++;
     else
         _table->m_size = _table->m_capacity;
+
+    return;
 }
 
 polyfn_t __vtable_search(unsigned int _table_idx, unsigned int _key)
- {
-     VTable *table = vtable_array[_table_idx];
-     hashitem *item  = table->m_items[_key];
+{
+    VTable   *table = vtable_array[_table_idx];
+    hashitem *item  = table->m_items[_key];
 
-     if(item == NULL)
-            return  NULL;
-     else
-            return item->m_func;
-
- }
+    if (item == NULL)
+        return NULL;
+    else
+        return item->m_func;
+}
