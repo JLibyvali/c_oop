@@ -21,10 +21,12 @@ keyword like:
 
 > You can via define lots of macros to control the generated code.
 
-| Macro       | Usage |
-|-------------|-------|
-| GEN_LOGFILE |       |
-| ---         | ---   |
+| Macro        | Usage                                                                    |
+|--------------|--------------------------------------------------------------------------|
+| GEN_LOGFILE  | Generate debug log file under executable's directory.                    |
+| VTABLE_SIZE  | Usage like: `#define VTABLE_SIZE 256`, then the vtable array size is 256 |
+| NEED_PRIVATE | IF class need private data members, default none private data members    |
+| ---          | ---                                                                      |
 
 # Build
 

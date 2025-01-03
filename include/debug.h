@@ -26,19 +26,15 @@ typedef enum
     FATA
 } log_level;
 
-#define __LOG_FILE(level, format, ...)                                                                            \
-    do                                                                                                            \
-    {                                                                                                             \
-        extern char *check_level(log_level);                                                                      \
-        char        *color = check_level(level);                                                                  \
-        extern void  gen_logfile();                                                                               \
-        gen_logfile();                                                                                            \
-        extern FILE *log_ptr;                                                                                     \
-        fprintf(log_ptr, "%s[%s]" LOG_NONE, color, #level);                                                       \
-        fprintf(log_ptr, LOG_CYAN "%s:%d:%s " LOG_NONE format "\n", __FILE__, __LINE__, __func__, ##__VA_ARGS__); \
-        fflush(log_ptr);                                                                                          \
-    }                                                                                                             \
-    while (0)
+#define __LOG_FILE(level, format, ...)                                                                        \
+    extern char *check_level(log_level);                                                                      \
+    char        *color = check_level(level);                                                                  \
+    extern void  gen_logfile();                                                                               \
+    gen_logfile();                                                                                            \
+    extern FILE *log_ptr;                                                                                     \
+    fprintf(log_ptr, "%s[%s]" LOG_NONE, color, #level);                                                       \
+    fprintf(log_ptr, LOG_CYAN "%s:%d:%s " LOG_NONE format "\n", __FILE__, __LINE__, __func__, ##__VA_ARGS__); \
+    fflush(log_ptr);
 
 // test macro: https://stackoverflow.com/questions/26099745/test-if-preprocessor-symbol-is-defined-inside-macro
 /**
@@ -60,31 +56,31 @@ typedef enum
 // ""#macro expand macro name as a string, whereas __MACRO_STR(macro) expand the macro first
 #define isdef(macro)                          (strcmp("" #macro, __MACRO_STR(macro)) != 0)
 
-#define Error(format, ...)                           \
-    do                                               \
-    {                                                \
-        if (ISDEF(GEN_LOGFILE))                      \
-        {                                            \
-            __LOG_FILE(FATA, format, ##__VA_ARGS__); \
-        }                                            \
-        printf(LOG_RED format "\n", ##__VA_ARGS__);  \
-        assert(0);                                   \
-    }                                                \
+#define Error(format, ...)                          \
+    do                                              \
+    {                                               \
+        if (ISDEF(GEN_LOGFILE))                     \
+        {                                           \
+            __LOG_FILE(FATA, format, ##__VA_ARGS__) \
+        }                                           \
+        printf(LOG_RED format "\n", ##__VA_ARGS__); \
+        assert(0);                                  \
+    }                                               \
     while (0)
 
-#define Assert(cond, format, ...)                        \
-    do                                                   \
-    {                                                    \
-        if (!cond)                                       \
-        {                                                \
-            if (ISDEF(GEN_LOGFILE))                      \
-            {                                            \
-                __LOG_FILE(FATA, format, ##__VA_ARGS__); \
-            }                                            \
-            printf(LOG_RED format "\n", ##__VA_ARGS__);  \
-            assert(cond);                                \
-        }                                                \
-    }                                                    \
+#define Assert(cond, format, ...)                       \
+    do                                                  \
+    {                                                   \
+        if (!cond)                                      \
+        {                                               \
+            if (ISDEF(GEN_LOGFILE))                     \
+            {                                           \
+                __LOG_FILE(FATA, format, ##__VA_ARGS__) \
+            }                                           \
+            printf(LOG_RED format "\n", ##__VA_ARGS__); \
+            assert(cond);                               \
+        }                                               \
+    }                                                   \
     while (0)
 
 // #####################################################################################
@@ -100,7 +96,7 @@ typedef enum
         {                                                        \
             if (ISDEF(GEN_LOGFILE))                              \
             {                                                    \
-                __LOG_FILE(INFO, msg, ##__VA_ARGS__);            \
+                __LOG_FILE(INFO, msg, ##__VA_ARGS__)             \
             }                                                    \
             printf(LOG_PURPLE msg "\n" LOG_NONE, ##__VA_ARGS__); \
             return retval;                                       \

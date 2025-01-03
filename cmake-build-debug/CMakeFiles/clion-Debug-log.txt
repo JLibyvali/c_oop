@@ -1,4 +1,0 @@
-/home/jlibyvali/.local/share/clion-2024.1.6/bin/cmake/linux/x64/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=/home/jlibyvali/.local/share/clion-2024.1.6/bin/ninja/linux/x64/ninja -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++ -G Ninja -S /home/jlibyvali/Developer/projetcs/c_oop -B /home/jlibyvali/Developer/projetcs/c_oop/cmake-build-debug
--- Configuring done (0.0s)
--- Generating done (0.0s)
--- Build files have been written to: /home/jlibyvali/Developer/projetcs/c_oop/cmake-build-debug

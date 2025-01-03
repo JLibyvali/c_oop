@@ -26,8 +26,7 @@ set(CMAKE_C_FLAGS_DEBUG "-g3 -ggdb3 -O0 -Wall")
 # ##############################################################################
 # Release Mode
 # ##############################################################################
-set(CMAKE_C_FLAGS_RELEASE "-O2 -Wall")
-
+set(CMAKE_C_FLAGS_RELEASE "-Os -Wall")
 
 # ##############################################################################
 # User macro definition
@@ -37,17 +36,15 @@ set(CMAKE_C_FLAGS_RELEASE "-O2 -Wall")
 # Export C_OOP library
 # ##############################################################################
 set(srcs
-        ./src/c_oop.c
-        ./src/hashtable.c
-)
+        ./src/hashtable.c)
 add_library(c_oop STATIC)
 target_sources(c_oop PRIVATE ${srcs})
 target_include_directories(c_oop PUBLIC
-        ./src
-        ./src/reflection)
+        src
+        src/reflection)
 
 # ##############################################################################
 # Test Target
 # ##############################################################################
-add_executable(test_poly ./test/test_poly.c)
-target_link_libraries(test_poly PRIVATE c_oop)
+add_executable(test_copy ./test/test_copy.c)
+target_link_libraries(test_copy PRIVATE c_oop)

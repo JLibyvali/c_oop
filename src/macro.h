@@ -70,13 +70,12 @@
 /**
  * @brief A macro used to `vectorize` C free() function, then you can use it as `delete(obj1,obj2,obj3,...)`
  */
-#define __Free_list(...)                                       \
+#define __Free_normals(...)                                    \
     {                                                          \
         void  *stopper     = (int[]){0};                       \
         void **list_tofree = (void *[]){__VA_ARGS__, stopper}; \
         for (int i = 0; list_tofree[i] != stopper; i++)        \
-            free(list_tofree[i]);                              \
-    }
+            free(list_tofree[i]);
 
 // ########################################################################
 //  Register OOP type information

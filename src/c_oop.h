@@ -33,6 +33,9 @@
         } _typename;                                                                                     \
         /* Declare a type validator function to check input paramter type at compile time. */            \
         void                     _typename##_method_typecheck(int (*)(_typename *, void *)) {}           \
+        /* Declare a private new/delete function. */                                                     \
+        extern void             *new_##_typename##_private();                                            \
+        void                     delete_##_typename##_private(void *_in);                                \
         /* Declared Type inner new function, will called by new macro.*/                                 \
         static inline _typename *new_##_typename()                                                       \
         {                                                                                                \
@@ -96,6 +99,7 @@
             _datamember;                                                                                 \
             _classmethod;                                                                                \
             POLYMETHOD_DECLARE(struct _typename, __VA_ARGS__)                                            \
+            atomic_uint __ref;                                                                           \
         } _typename;                                                                                     \
         /* Declare a type validator function to check input paramter type at compile time. */            \
         void                     _typename##_method_typecheck(int (*)(_typename *, void *)) {}           \
@@ -126,6 +130,7 @@
         ({                                             \
             _class *temp = new_##_class();             \
             __VA_OPT__(*temp = (_class){__VA_ARGS__};) \
+            atomic_init(&temp->__ref, 1);              \
             temp;                                      \
         })
 
@@ -133,13 +138,33 @@
  * @brief WHY: To emulate CPP `delete` keyword, you can delete(obj1,obj2,obj3,...)
  * @param _type_ptr The object pointer you wanna deleted.
  */
-#    define delete(_type_ptr, ...)                   \
-        ({                                           \
-            if (_type_ptr)                           \
-            {                                        \
-                free(_type_ptr);                     \
-                __VA_OPT__(__Free_list(__VA_ARGS__)) \
-            }                                        \
+#    define delete(_type_ptr, ...)                            \
+        ({                                                    \
+            if (_type_ptr)                                    \
+            {                                                 \
+                atomic_fetch_sub(&_type_ptr->__ref, 1);       \
+                if (atomic_load(&_type_ptr->__ref) == 0)      \
+                {                                             \
+                    /*TODO: Register class meta information*/ \
+                }                                             \
+                free(_type_ptr);                              \
+                __VA_OPT__(__Free_normals(__VA_ARGS__))       \
+            }                                                 \
+        })
+
+/**
+ * @brief WHY: To implement shallow copy, using reference count.
+ * @param _class The object pointer class name.
+ * @param _type_ptr The copied target object pointer.
+ */
+#    define copy(_class, _type_ptr)                                                                   \
+        ({                                                                                            \
+            Checkerr(_type_ptr, NULL, __MACRO_STR(copy) " macro function parameter is NULL input!!"); \
+            _class *ptr = malloc(sizeof(_class));                                                     \
+            Checkerr(ptr, NULL, "Malloc for "__MACRO_STR(copy) " function memory FAILED!!");          \
+            *ptr = *_type_ptr;                                                                        \
+            atomic_fetch_add(&ptr->__ref, 1);                                                         \
+            ptr;                                                                                      \
         })
 
 #endif
